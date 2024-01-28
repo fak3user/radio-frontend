@@ -21,6 +21,8 @@ export const Player = ({ url }) => {
         // });
     }
 
+    console.log(status);
+
     return (
         <div className={styles.wrapper}>
             {status === "online" ? (
