@@ -4,37 +4,39 @@ import React, { useEffect, useState } from "react";
 import ReactHlsPlayer from "@gumlet/react-hls-player";
 import styles from "./player.module.css";
 
-export const Player = () => {
+export const Player = ({ url }) => {
     const playerRef = React.useRef();
-    const [status, updateStatus] = useState("pause");
+    const [status, updateStatus] = useState("pending");
+
+    useEffect(() => {
+        fetch(url).then((res) => {
+            updateStatus(res.ok ? "online" : "offline");
+        });
+    }, []);
 
     function handleHlsObject(hls) {
         console.log(hls);
+        // hls.streamController.onvplaying(() => {
+        // console.log(123);
+        // });
     }
-
-    function handlePlayVideo() {
-        updateStatus("play");
-        playerRef.current.play();
-    }
-
-    function handlePauseVideo() {
-        updateStatus("pause");
-        playerRef.current.pause();
-    }
-
-    console.log(status);
 
     return (
         <div className={styles.wrapper}>
-            <ReactHlsPlayer
-                autoPlay
-                width={"100%"}
-                playerRef={playerRef}
-                controls
-                getHLSRef={handleHlsObject}
-                src="http://188.166.97.181:8888/test/index.m3u8"
-                // src="http://localhost:8888/test/index.m3u8"
-            />
+            {status === "online" ? (
+                <ReactHlsPlayer
+                    autoPlay
+                    width={"100%"}
+                    playerRef={playerRef}
+                    controls
+                    getHLSRef={handleHlsObject}
+                    src={url}
+                />
+            ) : (
+                <p className={styles.offline}>
+                    {status === "pending" ? "loading" : "offline"}
+                </p>
+            )}
         </div>
     );
 };
